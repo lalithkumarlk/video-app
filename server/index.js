@@ -16,7 +16,8 @@ class Connection{
 
 function server(io){
     io.on('connection',(socket) => {
-        new createConnection(io,socket)
+        console.log("connection :")
+        new Connection(io,socket)
     });
 };
 
