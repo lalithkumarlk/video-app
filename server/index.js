@@ -14,17 +14,24 @@ class Connection{
         // New user
         socket.on('new user', ({ type}) => {
             console.log(`new user joined type : ${type}`)
+            const notFound = users.find(itm => itm.id !== socket.id)
+            console.log(`not found, `,notFound);
+           
             const data = {id : socket.id, type };
             users.push(data);
             // socket.join("room 1");
             this.fetchUsers();
+            
         });
 
         socket.on('timer_value',({val}) =>this.emitTimerValue({val}))
+
+        socket.on('data value_',(data) =>this.emitDataValue(data))
     }
 
 
     emitNewUser(data){
+        console.log('*** ',data)
         this.io.emit('new user',data);
     }
 
@@ -35,6 +42,20 @@ class Connection{
     emitTimerValue({val}){
         console.log(`timer value_: ${val} by host ${this.socket.id}`)
         val > 0 && this.io.emit('timer_value_',{val});
+    }
+
+    emitDataValue(data){
+        console.log(`data value_: ${data} by host ${this.socket.id}`)
+        const { type } = data;
+        if(type === "MUTE_ALL"){
+            users = users.map(user => {
+                if(user.type !== "HOST"){
+                    user['isMute'] = true
+                }
+                return user
+            })
+        }
+        this.fetchUsers();
     }
 
     disconnect(){
